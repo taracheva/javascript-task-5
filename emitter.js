@@ -24,10 +24,7 @@ function getEmitter() {
          * @returns {Object}
          */
         on: function (event, context, handler) {
-            signedStudents.push({
-                event, context, handler, plannedCount: -1, currentCount: 0,
-                frequency: -1
-            });
+            signedStudents.push({ event, context, handler });
 
             return this;
         },
@@ -57,15 +54,7 @@ function getEmitter() {
                 .sort((firstStudent, secondStudent) =>
                     firstStudent.event.length < secondStudent.event.length);
             for (let subscriber of subscribers) {
-                if (subscriber.plannedCount === -1) {
-                    handleSubscriber(subscriber);
-                    continue;
-                }
-                if (subscriber.plannedCount > 0) {
-                    subscriber.handler.call(subscriber.context);
-                    subscriber.plannedCount--;
-                    continue;
-                }
+                subscriber.handler.call(subscriber.context);
             }
 
             return this;
@@ -78,19 +67,9 @@ function getEmitter() {
          * @param {Object} context
          * @param {Function} handler
          * @param {Number} times – сколько раз получить уведомление
-         * @returns {Object}
          */
         several: function (event, context, handler, times) {
-            if (times <= 0) {
-                return this.on(event, context, handler);
-            }
-            signedStudents.push({
-                event, context, handler, plannedCount: times, currentCount: 0,
-                frequency: -1
-            });
-
-            return this;
-
+            console.info(event, context, handler, times);
         },
 
         /**
@@ -100,18 +79,9 @@ function getEmitter() {
          * @param {Object} context
          * @param {Function} handler
          * @param {Number} frequency – как часто уведомлять
-         * @returns {Object}
          */
         through: function (event, context, handler, frequency) {
-            if (frequency <= 0) {
-                return this.on(event, context, handler);
-            }
-            signedStudents.push({
-                event, context, handler, plannedCount: -1, currentCount: 0,
-                frequency: frequency
-            });
-
-            return this;
+            console.info(event, context, handler, frequency);
         }
     };
 }
@@ -127,16 +97,4 @@ function getAllSubspace(event) {
     }
 
     return namespaces;
-}
-
-function handleSubscriber(subscriber) {
-    if (subscriber.frequency === -1) {
-        subscriber.handler.call(subscriber.context);
-        subscriber.currentCount++;
-    } else {
-        if (subscriber.currentCount % subscriber.frequency === 0) {
-            subscriber.handler.call(subscriber.context);
-        }
-        subscriber.currentCount++;
-    }
 }
