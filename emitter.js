@@ -87,6 +87,10 @@ function getEmitter() {
 }
 
 function getAllSubspace(event) {
+    if (event.length === 0) {
+        return [];
+    }
+
     let events = event.split('.');
     let namespaces = [];
     let currentNamespace = events[0];
