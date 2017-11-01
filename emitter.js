@@ -37,7 +37,9 @@ function getEmitter() {
          */
         off: function (event, context) {
             signedStudents = signedStudents.filter(signedStudent =>
-                !signedStudent.event.startsWith(event) || signedStudent.context !== context);
+                !((signedStudent.event.startsWith(event + '.') ||
+                signedStudent.event === event) &&
+                signedStudent.context === context));
 
             return this;
         },
