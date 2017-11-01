@@ -4,7 +4,7 @@
  * Сделано задание на звездочку
  * Реализованы методы several и through
  */
-getEmitter.isStar = true;
+getEmitter.isStar = false;
 module.exports = getEmitter;
 
 /**
@@ -12,6 +12,8 @@ module.exports = getEmitter;
  * @returns {Object}
  */
 function getEmitter() {
+    let signedStudents = [];
+
     return {
 
         /**
@@ -19,26 +21,43 @@ function getEmitter() {
          * @param {String} event
          * @param {Object} context
          * @param {Function} handler
+         * @returns {Object}
          */
         on: function (event, context, handler) {
-            console.info(event, context, handler);
+            signedStudents.push({ event, context, handler });
+
+            return this;
         },
 
         /**
          * Отписаться от события
          * @param {String} event
          * @param {Object} context
+         * @returns {Object}
          */
         off: function (event, context) {
-            console.info(event, context);
+            signedStudents = signedStudents.filter(signedStudent =>
+                !signedStudent.event.startsWith(event) || signedStudent.context !== context);
+
+            return this;
         },
 
         /**
          * Уведомить о событии
          * @param {String} event
+         * @returns {Object}
          */
         emit: function (event) {
-            console.info(event);
+            let namespaces = getAllSubspace(event);
+            let subscribers = signedStudents
+                .filter(signedStudent => namespaces.includes(signedStudent.event))
+                .sort((firstStudent, secondStudent) =>
+                    firstStudent.event.length < secondStudent.event.length);
+            for (let subscriber of subscribers) {
+                subscriber.handler.call(subscriber.context);
+            }
+
+            return this;
         },
 
         /**
@@ -65,4 +84,17 @@ function getEmitter() {
             console.info(event, context, handler, frequency);
         }
     };
+}
+
+function getAllSubspace(event) {
+    let events = event.split('.');
+    let namespaces = [];
+    let currentNamespace = events[0];
+    namespaces.push(currentNamespace);
+    for (let i = 1; i < events.length; i++) {
+        currentNamespace += '.' + events[i];
+        namespaces.push(currentNamespace);
+    }
+
+    return namespaces;
 }
