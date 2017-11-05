@@ -25,7 +25,11 @@ function getEmitter() {
          */
         on: function (event, context, handler) {
             signedStudents.push({
-                event, context, handler, plannedCount: -1, currentCount: 0,
+                event,
+                context,
+                handler,
+                plannedCount: -1,
+                currentCount: 0,
                 frequency: -1
             });
 
@@ -53,7 +57,7 @@ function getEmitter() {
          * @returns {Object}
          */
         emit: function (event) {
-            let namespaces = getAllSubspace(event);
+            let namespaces = getAllNamespaces(event);
             let subscribers = signedStudents
                 .filter(signedStudent => namespaces.includes(signedStudent.event))
                 .sort((firstStudent, secondStudent) =>
@@ -61,12 +65,10 @@ function getEmitter() {
             for (let subscriber of subscribers) {
                 if (subscriber.plannedCount === -1) {
                     handleSubscriber(subscriber);
-                    continue;
                 }
                 if (subscriber.plannedCount > 0) {
                     subscriber.handler.call(subscriber.context);
                     subscriber.plannedCount--;
-                    continue;
                 }
             }
 
@@ -87,7 +89,11 @@ function getEmitter() {
                 return this.on(event, context, handler);
             }
             signedStudents.push({
-                event, context, handler, plannedCount: times, currentCount: 0,
+                event,
+                context,
+                handler,
+                plannedCount: times,
+                currentCount: 0,
                 frequency: -1
             });
 
@@ -118,7 +124,7 @@ function getEmitter() {
     };
 }
 
-function getAllSubspace(event) {
+function getAllNamespaces(event) {
     let events = event.split('.');
     let namespaces = [];
     let currentNamespace = events[0];
@@ -134,11 +140,8 @@ function getAllSubspace(event) {
 function handleSubscriber(subscriber) {
     if (subscriber.frequency === -1) {
         subscriber.handler.call(subscriber.context);
-        subscriber.currentCount++;
-    } else {
-        if (subscriber.currentCount % subscriber.frequency === 0) {
-            subscriber.handler.call(subscriber.context);
-        }
-        subscriber.currentCount++;
+    } else if (subscriber.currentCount % subscriber.frequency === 0) {
+        subscriber.handler.call(subscriber.context);
     }
+    subscriber.currentCount++;
 }
