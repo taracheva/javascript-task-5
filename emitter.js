@@ -138,9 +138,8 @@ function getAllNamespaces(event) {
 }
 
 function handleSubscriber(subscriber) {
-    if (subscriber.frequency === -1) {
-        subscriber.handler.call(subscriber.context);
-    } else if (subscriber.currentCount % subscriber.frequency === 0) {
+    if (subscriber.frequency === -1 ||
+    subscriber.currentCount % subscriber.frequency === 0) {
         subscriber.handler.call(subscriber.context);
     }
     subscriber.currentCount++;
