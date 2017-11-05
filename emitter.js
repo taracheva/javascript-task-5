@@ -115,7 +115,11 @@ function getEmitter() {
                 return this.on(event, context, handler);
             }
             signedStudents.push({
-                event, context, handler, plannedCount: -1, currentCount: 0,
+                event,
+                context,
+                handler,
+                plannedCount: -1,
+                currentCount: 0,
                 frequency: frequency
             });
 
